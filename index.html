@@ -119,6 +119,15 @@
   .cpop button { flex: 1; border: 0; border-radius: 999px; padding: 9px 0; font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; cursor: pointer; }
   .cpop .send { background: var(--mauve); color: var(--white); }
   .cpop .cancel { background: var(--off); color: var(--grey); }
+  .cpanel { position: fixed; right: 22px; bottom: 86px; z-index: 210; width: 320px; max-height: 60vh; overflow-y: auto; background: var(--white); border: 1.5px solid var(--mauve); border-radius: 14px; padding: 16px; box-shadow: 0 12px 32px rgba(0,0,0,.25); display: none; font-family: 'Inter', sans-serif; }
+  .cpanel.open { display: block; }
+  .cpanel h4 { margin: 0 0 4px; font-size: .68rem; letter-spacing: .18em; text-transform: uppercase; color: var(--mauve); }
+  .cpanel .cnew { width: 100%; border: 0; border-radius: 999px; padding: 10px 0; background: var(--mauve); color: var(--white); font-size: .66rem; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
+  .cpanel .citem { border-top: 1px solid var(--off); padding: 9px 0; font-size: .85rem; color: var(--ink); }
+  .cpanel .citem .who { font-style: italic; font-size: .72rem; color: var(--grey); margin-bottom: 3px; }
+  .cpanel .cempty { font-size: .82rem; color: var(--grey); padding: 6px 0 2px; }
+  .cpanel .badge { position: absolute; top: -6px; right: -6px; background: var(--sage); color: var(--black); border-radius: 999px; min-width: 20px; height: 20px; font-size: .68rem; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 5px; }
+  .cbtn { position: relative; overflow: visible; }
 
   /* dynamics */
   html { scroll-behavior: smooth; }
@@ -409,17 +418,41 @@
   // floating "comment anywhere" widget: click icon, click any element, type, send
   var btn = document.createElement('button');
   btn.className = 'cbtn';
-  btn.title = 'Comment on this page';
+  btn.title = 'Comments';
   btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H8l-5 4V6a2 2 0 0 1 2-2z"/></svg>';
   document.body.appendChild(btn);
+  var badge = document.createElement('span');
+  badge.className = 'badge';
+  badge.style.display = 'none';
+  btn.appendChild(badge);
+
+  var panel = document.createElement('div');
+  panel.className = 'cpanel';
+  panel.innerHTML = '<h4>Comments</h4><button class="cnew">Add a comment</button><div class="clist"><div class="cempty">No comments yet.</div></div>';
+  document.body.appendChild(panel);
 
   var pop = document.createElement('div');
   pop.className = 'cpop';
   pop.innerHTML = '<div class="ctx"></div><textarea placeholder="Your comment…"></textarea>'
-    + '<div class="row"><button class="cancel">Cancel</button><button class="send">Send</button></div>';
+    + '<div class="row"><button class="cancel">Cancel</button><button class="send">Save</button></div>';
   document.body.appendChild(pop);
 
   var target = null, picking = false, lastHover = null;
+
+  function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  function loadComments() {
+    fetch('/api/comments').then(function (r) { return r.json(); }).then(function (rows) {
+      var list = panel.querySelector('.clist');
+      if (!Array.isArray(rows) || !rows.length) { list.innerHTML = '<div class="cempty">No comments yet.</div>'; badge.style.display = 'none'; return; }
+      list.innerHTML = rows.map(function (c) {
+        return '<div class="citem">' + (c.section ? '<div class="who">on “' + esc(c.section) + '”</div>' : '') + esc(c.message) + '</div>';
+      }).join('');
+      badge.style.display = 'flex';
+      badge.textContent = rows.length;
+    }).catch(function () { panel.querySelector('.clist').innerHTML = '<div class="cempty">Could not load comments.</div>'; });
+  }
+  loadComments();
 
   function pick(e) {
     if (!picking || e.target.closest('.cbtn') || e.target.closest('.cpop')) return;
@@ -445,10 +478,15 @@
   }
 
   btn.addEventListener('click', function () {
+    if (panel.classList.contains('open')) { panel.classList.remove('open'); return; }
+    panel.classList.add('open');
+    pop.classList.remove('open');
+  });
+  panel.querySelector('.cnew').addEventListener('click', function () {
+    panel.classList.remove('open');
     picking = true;
     document.body.classList.add('picking');
     document.addEventListener('mousemove', hover, true);
-    pop.classList.remove('open');
   });
   document.addEventListener('click', pick, true);
   pop.querySelector('.cancel').addEventListener('click', function () { pop.classList.remove('open'); });
@@ -456,11 +494,16 @@
     var msg = pop.querySelector('textarea').value.trim();
     if (!msg || !target) return;
     var ctx = (target.textContent || '').trim().slice(0, 80);
-    window.location.href = 'mailto:genesisrojova@gmail.com'
-      + '?subject=' + encodeURIComponent('Portfolio comment')
-      + '&body=' + encodeURIComponent('Comment on: “' + ctx + '”\n\n' + msg + '\n\n(Sent from the portfolio page)');
+    fetch('/api/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ section: ctx, message: msg })
+    }).then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
+      .then(function () { loadComments(); })
+      .catch(function () { alert('Could not save your comment. Please try again.'); });
     pop.classList.remove('open');
     pop.querySelector('textarea').value = '';
+    panel.classList.add('open');
   });
 })();
 </script>
