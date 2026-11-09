@@ -109,6 +109,7 @@
   .cbtn { position: fixed; right: 22px; bottom: 22px; width: 52px; height: 52px; border-radius: 50%; background: var(--mauve); color: var(--white); border: 2px solid var(--white); box-shadow: 0 6px 18px rgba(0,0,0,.3); cursor: pointer; z-index: 200; display: flex; align-items: center; justify-content: center; transition: transform .2s; }
   .cbtn:hover { transform: scale(1.08); }
   .cbtn svg { width: 24px; height: 24px; fill: var(--white); }
+  .cbtn .badge { position: absolute; top: -6px; right: -6px; }
   body.picking, body.picking * { cursor: crosshair !important; }
   .pick-hover { outline: 2px dashed var(--sage) !important; outline-offset: 2px; }
   .cpop { position: fixed; z-index: 210; width: 300px; background: var(--white); border: 1.5px solid var(--mauve); border-radius: 12px; padding: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.25); display: none; font-family: 'Inter', sans-serif; }
@@ -126,8 +127,7 @@
   .cpanel .citem { border-top: 1px solid var(--off); padding: 9px 0; font-size: .85rem; color: var(--ink); }
   .cpanel .citem .who { font-style: italic; font-size: .72rem; color: var(--grey); margin-bottom: 3px; }
   .cpanel .cempty { font-size: .82rem; color: var(--grey); padding: 6px 0 2px; }
-  .cpanel .badge { position: absolute; top: -6px; right: -6px; background: var(--sage); color: var(--black); border-radius: 999px; min-width: 20px; height: 20px; font-size: .68rem; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 5px; }
-  .cbtn { position: relative; overflow: visible; }
+  .cpanel .badge { top: -6px; right: -6px; background: var(--sage); color: var(--black); border-radius: 999px; min-width: 20px; height: 20px; font-size: .68rem; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 5px; }
 
   /* dynamics */
   html { scroll-behavior: smooth; }
