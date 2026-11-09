@@ -413,6 +413,10 @@
 </div>
 <script>
 (function () {
+  // floating "comment anywhere" widget — INTERNAL ONLY.
+  // Enabled with ?internal=1 in the URL (e.g. for your own review).
+  // Client-facing production shows no comment button.
+  if (!new URLSearchParams(location.search).has('internal')) return;
   // floating "comment anywhere" widget: click icon, click any element, type, send
   var btn = document.createElement('button');
   btn.className = 'cbtn';
