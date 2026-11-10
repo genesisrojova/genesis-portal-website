@@ -53,9 +53,12 @@
   .sub { color: var(--grey); font-size: .8rem; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 28px; }
 
   /* about */
-  .about { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  .about { display: grid; grid-template-columns: 1fr; gap: 8px; position: relative; }
   .about p { font-size: .95rem; color: #333; max-width: 640px; }
   .about .lead { font-size: 1.02rem; color: var(--black); }
+  .about-photo { position: absolute; top: -6px; right: 0; width: min(170px, 30%); z-index: 1; }
+  .about-photo img { width: 100%; height: auto; filter: drop-shadow(0 14px 22px rgba(51,50,46,.18)); }
+  @media (max-width: 700px) { .about-photo { position: static; width: min(170px, 45%); margin: 10px 0 2px; } }
 
   /* tools */
   .tools { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -208,6 +211,7 @@
   <div class="wrap about">
     <p class="kicker">About Me</p>
     <h2>built for the behind-the-scenes<span class="big">ABOUT ME</span></h2>
+    <div class="about-photo"><img src="img/genesis-about-cutout.png" alt="Genesis Narag Rojo"></div>
     <p class="lead">I'm a Virtual Assistant based in the Philippines, working with founders, CEOs, and business owners who need dependable hands on the operations side.</p>
     <p>I ran lead pipelines, inboxes, calendars, records, and email and social media end to end for a business consulting company — from planning and creating the content to posting and replying. I build reports with AI tools and check every one for accuracy before it's delivered. Before that, seven years in customer service taught me to stay patient and precise under pressure.</p>
     <p>Reliable support. Clear communication. Organized systems.</p>
